@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/resources/scaffold/pageTemplate.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="page" value='#{userBean.id}'/>
+                <f:viewParam name="page" value='#{userBean.units}'/>
+                
+              
+                <f:event type="preRenderView" listener='#{userBean.addUnitsWith}'/>
+	</f:metadata>
+
+	<ui:param name="pageTitle" value="Add units"/>
+
+	<ui:define name="header">
+		User
+	</ui:define>
+
+	
+	<ui:define name="subheader">
+		Search User entities
+	</ui:define>
+
+	<ui:define name="footer"/>
+
+	<ui:define name="main">
+		<h:form >
+			
+						<h:outputLabel for="ad1" value="Add units"/>
+						<h:panelGroup>
+                                                    <h:inputText id="ad2" value="#{userBean.units}"/>
+							<h:message for="ad3" styleClass="error"/>
+						</h:panelGroup>
+						
+					
+					<h:panelGroup styleClass="buttons">
+                                            
+                                            <h:commandLink value="Add" action="unit"   styleClass="btn btn-primary"/>
+						
+					</h:panelGroup>
+			
+			
+			<ui:include src="/resources/scaffold/paginator.xhtml">
+				<ui:param name="paginatorBean" value='#{userBean}'/>
+			</ui:include>
+		</h:form>
+			
+	</ui:define>
+
+</ui:composition>
