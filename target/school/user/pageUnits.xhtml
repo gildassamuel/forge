@@ -7,13 +7,10 @@
 	template="/resources/scaffold/pageTemplate.xhtml">
 
 	<f:metadata>
-		<f:viewParam name="page" value='#{userBean.id}'/>
-                <f:viewParam name="page" value='#{userBean.units}'/>
-                
-              
-                <f:event type="preRenderView" listener='#{userBean.addUnitsWith}'/>
+		<f:viewParam name="id" value='#{userBean.id}'/>
+		<f:event type="preRenderView" listener='#{userBean.retrieve}'/>
 	</f:metadata>
-
+	
 	<ui:param name="pageTitle" value="Add units"/>
 
 	<ui:define name="header">
@@ -32,14 +29,14 @@
 			
 						<h:outputLabel for="ad1" value="Add units"/>
 						<h:panelGroup>
-                                                    <h:inputText id="ad2" value="#{userBean.units}"/>
+                                                    <h:inputText id="ad2" value="#{userBean.incAmnt}"/>
 							<h:message for="ad3" styleClass="error"/>
 						</h:panelGroup>
 						
 					
 					<h:panelGroup styleClass="buttons">
                                             
-                                            <h:commandLink value="Add" action="unit"   styleClass="btn btn-primary"/>
+                                            <h:commandLink value="Add" action='#{userBean.incUnitsFromUnits}'   styleClass="btn btn-primary"/>
 						
 					</h:panelGroup>
 			

@@ -42,364 +42,383 @@ import com.dartcorp.demo.model.User;
 public class UserBean implements Serializable
 {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   /*
-    * Support creating and retrieving User entities
-    */
+	/*
+	 * Support creating and retrieving User entities
+	 */
 
-   private Long id;
-   private Long units;
+	private Long id;
+	private Long units;
 
-   public Long getId()
-   {
-      return this.id;
-   }
+	private Long incAmnt;
+	public Long getId()
+	{
+		return this.id;
+	}
 
-   public void setId(Long id)
-   {
-      this.id = id;
-   }
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
 
-   private User user;
+	private User user;
 
-   public User getUser()
-   {
-      return this.user;
-   }
+	public User getUser()
+	{
+		return this.user;
+	}
 
-   public void setUser(User user)
-   {
-      this.user = user;
-   }
+	public void setUser(User user)
+	{
+		this.user = user;
+	}
 
-   @Inject
-   private Conversation conversation;
 
-   @PersistenceContext(unitName = "school-persistence-unit", type = PersistenceContextType.EXTENDED)
-   private EntityManager entityManager;
+	public Long getIncAmnt() {
+		return incAmnt;
+	}
 
-   public String create()
-   {
+	public void setIncAmnt(Long incAmnt) {
+		this.incAmnt = incAmnt;
+	}
 
-      this.conversation.begin();
-      this.conversation.setTimeout(1800000L);
-      return "create?faces-redirect=true";
-   }
+	@Inject
+	private Conversation conversation;
 
-   public void retrieve()
-   {
+	@PersistenceContext(unitName = "school-persistence-unit", type = PersistenceContextType.EXTENDED)
+	private EntityManager entityManager;
 
-      if (FacesContext.getCurrentInstance().isPostback())
-      {
-         return;
-      }
+	public String create()
+	{
 
-      if (this.conversation.isTransient())
-      {
-         this.conversation.begin();
-         this.conversation.setTimeout(1800000L);
-      }
+		this.conversation.begin();
+		this.conversation.setTimeout(1800000L);
+		return "create?faces-redirect=true";
+	}
 
-      if (this.id == null)
-      {
-         this.user = this.example;
-      }
-      else
-      {
-         this.user = findById(getId());
-      }
-   }
+	public void retrieve()
+	{
 
-   public User findById(Long id)
-   {
+		if (FacesContext.getCurrentInstance().isPostback())
+		{
+			return;
+		}
 
-      return this.entityManager.find(User.class, id);
-   }
+		if (this.conversation.isTransient())
+		{
+			this.conversation.begin();
+			this.conversation.setTimeout(1800000L);
+		}
 
-   /*
-    * Support updating and deleting User entities
-    */
+		if (this.id == null)
+		{
+			this.user = this.example;
+		}
+		else
+		{
+			this.user = findById(getId());
+		}
+	}
 
-   public String update()
-   {
-      this.conversation.end();
+	public String incUnitsFromUnits(){
+		retrieve();
+		if(user == null) {
+			return null;
+		}
+		user.setUnits(incAmnt.longValue() + user.getUnits() );
+		update();
+		return "view?faces-redirect=true&id=" + this.user.getId();
+	}
+	public User findById(Long id)
+	{
 
-      try
-      {
-         if (this.id == null)
-         {
-            this.entityManager.persist(this.user);
-            return "search?faces-redirect=true";
-         }
-         else
-         {
-            this.entityManager.merge(this.user);
-            return "view?faces-redirect=true&id=" + this.user.getId();
-         }
-      }
-      catch (Exception e)
-      {
-         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
-         return null;
-      }
-   }
+		return this.entityManager.find(User.class, id);
+	}
 
-   public String delete()
-   {
-      this.conversation.end();
+	/*
+	 * Support updating and deleting User entities
+	 */
 
-      try
-      {
-         User deletableEntity = findById(getId());
+	public String update()
+	{
+		this.conversation.end();
 
-         this.entityManager.remove(deletableEntity);
-         this.entityManager.flush();
-         return "search?faces-redirect=true";
-      }
-      catch (Exception e)
-      {
-         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
-         return null;
-      }
-   }
+		try
+		{
+			if (this.id == null)
+			{
+				this.entityManager.persist(this.user);
+				return "search?faces-redirect=true";
+			}
+			else
+			{
+				this.entityManager.merge(this.user);
+				return "view?faces-redirect=true&id=" + this.user.getId();
+			}
+		}
+		catch (Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
+			return null;
+		}
+	}
 
-   /*
-    * Support searching User entities with pagination
-    */
+	public String delete()
+	{
+		this.conversation.end();
 
-   private int page;
-   private long count;
-   private List<User> pageItems;
+		try
+		{
+			User deletableEntity = findById(getId());
 
-   private User example = new User();
+			this.entityManager.remove(deletableEntity);
+			this.entityManager.flush();
+			return "search?faces-redirect=true";
+		}
+		catch (Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
+			return null;
+		}
+	}
 
-   public int getPage()
-   {
-      return this.page;
-   }
+	/*
+	 * Support searching User entities with pagination
+	 */
 
-   public void setPage(int page)
-   {
-      this.page = page;
-   }
-   
-    public Long getUnits()
-   {
-      return this.units;
-   }
+	private int page;
+	private long count;
+	private List<User> pageItems;
 
-   public void setUnits(Long units)
-   {
-      this.units = units;
-   }
+	private User example = new User();
 
-   public int getPageSize()
-   {
-      return 10;
-   }
+	public int getPage()
+	{
+		return this.page;
+	}
 
-   public User getExample()
-   {
-      return this.example;
-   }
+	public void setPage(int page)
+	{
+		this.page = page;
+	}
 
-   public void setExample(User example)
-   {
-      this.example = example;
-   }
+	public Long getUnits()
+	{
+		return this.units;
+	}
 
-   public String search()
-   {
-      this.page = 0;
-      return null;
-   }
+	public void setUnits(Long units)
+	{
+		this.units = units;
+	}
 
-   public void paginate()
-   {
+	public int getPageSize()
+	{
+		return 10;
+	}
 
-      CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+	public User getExample()
+	{
+		return this.example;
+	}
 
-      // Populate this.count
+	public void setExample(User example)
+	{
+		this.example = example;
+	}
 
-      CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
-      Root<User> root = countCriteria.from(User.class);
-      countCriteria = countCriteria.select(builder.count(root)).where(
-            getSearchPredicates(root));
-      this.count = this.entityManager.createQuery(countCriteria)
-            .getSingleResult();
+	public String search()
+	{
+		this.page = 0;
+		return null;
+	}
 
-      // Populate this.pageItems
+	public void paginate()
+	{
 
-      CriteriaQuery<User> criteria = builder.createQuery(User.class);
-      root = criteria.from(User.class);
-      TypedQuery<User> query = this.entityManager.createQuery(criteria
-            .select(root).where(getSearchPredicates(root)));
-      query.setFirstResult(this.page * getPageSize()).setMaxResults(
-            getPageSize());
-      this.pageItems = query.getResultList();
-   }
+		CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
 
-   private Predicate[] getSearchPredicates(Root<User> root)
-   {
+		// Populate this.count
 
-      CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-      List<Predicate> predicatesList = new ArrayList<Predicate>();
+		CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
+		Root<User> root = countCriteria.from(User.class);
+		countCriteria = countCriteria.select(builder.count(root)).where(
+				getSearchPredicates(root));
+		this.count = this.entityManager.createQuery(countCriteria)
+				.getSingleResult();
 
-      String fullName = this.example.getFullName();
-      if (fullName != null && !"".equals(fullName))
-      {
-         predicatesList.add(builder.like(builder.lower(root.<String> get("fullName")), '%' + fullName.toLowerCase() + '%'));
-      }
-      String phoneNumber = this.example.getPhoneNumber();
-      if (phoneNumber != null && !"".equals(phoneNumber))
-      {
-         predicatesList.add(builder.like(builder.lower(root.<String> get("phoneNumber")), '%' + phoneNumber.toLowerCase() + '%'));
-      }
-      long units = this.example.getUnits();
-      if (units != 0)
-      {
-         predicatesList.add(builder.equal(root.get("units"), units));
-      }
+		// Populate this.pageItems
 
-      return predicatesList.toArray(new Predicate[predicatesList.size()]);
-   }
+		CriteriaQuery<User> criteria = builder.createQuery(User.class);
+		root = criteria.from(User.class);
+		TypedQuery<User> query = this.entityManager.createQuery(criteria
+				.select(root).where(getSearchPredicates(root)));
+		query.setFirstResult(this.page * getPageSize()).setMaxResults(
+				getPageSize());
+		this.pageItems = query.getResultList();
+	}
 
-   public List<User> getPageItems()
-   {
-      return this.pageItems;
-   }
+	private Predicate[] getSearchPredicates(Root<User> root)
+	{
 
-   public long getCount()
-   {
-      return this.count;
-   }
+		CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+		List<Predicate> predicatesList = new ArrayList<Predicate>();
 
-   /*
-    * Support listing and POSTing back User entities (e.g. from inside an
-    * HtmlSelectOneMenu)
-    */
+		String fullName = this.example.getFullName();
+		if (fullName != null && !"".equals(fullName))
+		{
+			predicatesList.add(builder.like(builder.lower(root.<String> get("fullName")), '%' + fullName.toLowerCase() + '%'));
+		}
+		String phoneNumber = this.example.getPhoneNumber();
+		if (phoneNumber != null && !"".equals(phoneNumber))
+		{
+			predicatesList.add(builder.like(builder.lower(root.<String> get("phoneNumber")), '%' + phoneNumber.toLowerCase() + '%'));
+		}
+		long units = this.example.getUnits();
+		if (units != 0)
+		{
+			predicatesList.add(builder.equal(root.get("units"), units));
+		}
 
-   public List<User> getAll()
-   {
+		return predicatesList.toArray(new Predicate[predicatesList.size()]);
+	}
 
-      CriteriaQuery<User> criteria = this.entityManager
-            .getCriteriaBuilder().createQuery(User.class);
-      return this.entityManager.createQuery(
-            criteria.select(criteria.from(User.class))).getResultList();
-   }
+	public List<User> getPageItems()
+	{
+		return this.pageItems;
+	}
 
-   @Resource
-   private SessionContext sessionContext;
+	public long getCount()
+	{
+		return this.count;
+	}
 
-   public Converter getConverter()
-   {
+	/*
+	 * Support listing and POSTing back User entities (e.g. from inside an
+	 * HtmlSelectOneMenu)
+	 */
 
-      final UserBean ejbProxy = this.sessionContext.getBusinessObject(UserBean.class);
+	public List<User> getAll()
+	{
 
-      return new Converter()
-      {
+		CriteriaQuery<User> criteria = this.entityManager
+				.getCriteriaBuilder().createQuery(User.class);
+		return this.entityManager.createQuery(
+				criteria.select(criteria.from(User.class))).getResultList();
+	}
 
-         @Override
-         public Object getAsObject(FacesContext context,
-               UIComponent component, String value)
-         {
+	@Resource
+	private SessionContext sessionContext;
 
-            return ejbProxy.findById(Long.valueOf(value));
-         }
+	public Converter getConverter()
+	{
 
-         @Override
-         public String getAsString(FacesContext context,
-               UIComponent component, Object value)
-         {
+		final UserBean ejbProxy = this.sessionContext.getBusinessObject(UserBean.class);
 
-            if (value == null)
-            {
-               return "";
-            }
+		return new Converter()
+		{
 
-            return String.valueOf(((User) value).getId());
-         }
-      };
-   }
+			@Override
+			public Object getAsObject(FacesContext context,
+					UIComponent component, String value)
+			{
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
+				return ejbProxy.findById(Long.valueOf(value));
+			}
 
-   private User add = new User();
+			@Override
+			public String getAsString(FacesContext context,
+					UIComponent component, Object value)
+			{
 
-   public User getAdd()
-   {
-      return this.add;
-   }
+				if (value == null)
+				{
+					return "";
+				}
 
-   public User getAdded()
-   {
-      User added = this.add;
-      this.add = new User();
-      return added;
-   }
-   //increment units by 1
-   public String addUnits1(){
- 
-      try
-      {
-         if (this.id == null)
-         {
-            this.entityManager.persist(this.user);
-            return "search?faces-redirect=true";
-         }
-         else
-         {
-            this.user = findById(getId());
-         this.user.setUnits(this.user.getUnits()+1);
-         this.entityManager.merge(this.user);
-      //this.retrieve();
-       return "view?faces-redirect=true&id=" + this.user.getId();
-   
-         }
-      }
-      catch (Exception e)
-      {
-         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
-         return null;
-         
-      }
-      
-   }
-   
-   
-   //increment units by val
-    public String addUnitsWith(){
-      
-    
-      try
-      {
-         if (this.id == null)
-         {
-            this.entityManager.persist(this.user);
-            return "search?faces-redirect=true";
-         }
-         else
-         {
-            this.user = findById(getId());
-         this.user.setUnits(this.user.getUnits()+this.getUnits());
-         this.entityManager.merge(this.user);
-    
-       return "view?faces-redirect=true&id=" + this.user.getId();
-         
-         }
-      }
-      catch (Exception e)
-      {
-         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
-         return null;
-         
-      }
-      
-   }
+				return String.valueOf(((User) value).getId());
+			}
+		};
+	}
 
-  
-   
+	/*
+	 * Support adding children to bidirectional, one-to-many tables
+	 */
+
+	private User add = new User();
+
+	public User getAdd()
+	{
+		return this.add;
+	}
+
+	public User getAdded()
+	{
+		User added = this.add;
+		this.add = new User();
+		return added;
+	}
+	//increment units by 1
+	public String addUnits1(){
+
+		try
+		{
+			if (this.id == null)
+			{
+				this.entityManager.persist(this.user);
+				return "search?faces-redirect=true";
+			}
+			else
+			{
+				this.user = findById(getId());
+				this.user.setUnits(this.user.getUnits()+1);
+				this.entityManager.merge(this.user);
+				//this.retrieve();
+				return "view?faces-redirect=true&id=" + this.user.getId();
+
+			}
+		}
+		catch (Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
+			return null;
+
+		}
+
+	}
+
+
+	//increment units by val
+	public String addUnitsWith(){
+
+
+		try
+		{
+			if (this.id == null)
+			{
+				this.entityManager.persist(this.user);
+				return "search?faces-redirect=true";
+			}
+			else
+			{
+				this.user = findById(getId());
+				this.user.setUnits(this.user.getUnits()+this.getUnits());
+				this.entityManager.merge(this.user);
+
+				return "view?faces-redirect=true&id=" + this.user.getId();
+
+			}
+		}
+		catch (Exception e)
+		{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
+			return null;
+
+		}
+
+	}
+
+
+
 }
